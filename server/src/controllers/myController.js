@@ -3,9 +3,14 @@ import Loan from "../models/Loan.js";
 import Fine from "../models/Fine.js";
 import Repayment from "../models/Repayment.js";
 import Settings from "../models/Settings.js";
+import WelfarePayout from "../models/WelfarePayout.js";
+import Meeting from "../models/Meeting.js";
+import DividendRun from "../models/DividendRun.js";
+import ContributionType from "../models/ContributionType.js";
 import { asyncHandler } from "../middleware/errors.js";
 import { getSavings } from "../utils/savings.js";
 import { loanRequirements } from "../utils/rules.js";
+import { fundBalance } from "../utils/welfare.js";
 
 export const mySavings = asyncHandler(async (req, res) => {
   const contributions = await Contribution.find({ member: req.user._id })
@@ -58,4 +63,35 @@ export const myStatement = asyncHandler(async (req, res) => {
     savings: await getSavings(req.user._id),
     contributions, loans, repayments, fines,
   });
+});
+
+export const myWelfare = asyncHandler(async (req, res) => {
+  const type = await ContributionType.findOne({ code: "welfare" });
+  const mine = type ? await Contribution.find({ member: req.user._id, type: type._id }) : [];
+  res.json({
+    fund: await fundBalance(),
+    myContributions: mine.reduce((s, c) => s + c.amount, 0),
+    myPayouts: await WelfarePayout.find({ member: req.user._id }).sort("-date"),
+    rules: await Settings.get(), // governance rules for the "my welfare & governance" screen
+  });
+});
+
+export const myAttendance = asyncHandler(async (req, res) => {
+  const meetings = await Meeting.find({ "attendance.member": req.user._id }).sort("-date");
+  res.json(
+    meetings.map((m) => ({
+      id: m._id, title: m.title, date: m.date,
+      status: m.attendance.find((a) => String(a.member) === String(req.user._id))?.status,
+    }))
+  );
+});
+
+export const myDividends = asyncHandler(async (req, res) => {
+  const runs = await DividendRun.find({ status: "finalized", "allocations.member": req.user._id }).sort("-year");
+  res.json(
+    runs.map((r) => {
+      const a = r.allocations.find((x) => String(x.member) === String(req.user._id));
+      return { year: r.year, savings: a.savings, share: a.share, amount: a.amount, paid: a.paid, paidOn: a.paidOn };
+    })
+  );
 });

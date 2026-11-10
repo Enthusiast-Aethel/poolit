@@ -9,5 +9,8 @@ router.get("/guarantees", my.myGuarantees);
 router.get("/fines", my.myFines);
 router.get("/loan-eligibility", my.myLoanEligibility);
 router.get("/statement", my.myStatement);
+router.get("/welfare", my.myWelfare);
+router.get("/attendance", my.myAttendance);
+router.get("/dividends", my.myDividends);
 
 export default router;

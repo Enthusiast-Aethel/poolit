@@ -12,3 +12,13 @@ export async function getSavings(memberId) {
   ]);
   return r[0]?.total || 0;
 }
+
+// Cumulative savings per member up to (and including) a year
+export async function getSavingsByMember(upToYear) {
+  const type = await ContributionType.findOne({ code: "monthly" });
+  if (!type) return [];
+  return Contribution.aggregate([
+    { $match: { type: type._id, year: { $lte: upToYear } } },
+    { $group: { _id: "$member", total: { $sum: "$amount" } } },
+  ]);
+}

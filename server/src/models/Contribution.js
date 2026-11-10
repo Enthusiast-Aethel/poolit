@@ -10,6 +10,8 @@ const contributionSchema = new mongoose.Schema(
     paidOn: { type: Date, default: Date.now },
     reference: { type: String, trim: true },   // e.g. M-Pesa code
     recordedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    cycle: { type: mongoose.Schema.Types.ObjectId, ref: "MerryGoRound" },
+    round: Number,
   },
   { timestamps: true }
 );

@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import { asyncHandler, HttpError } from "../middleware/errors.js";
 
 export const recordContribution = asyncHandler(async (req, res) => {
-  const { member, type, amount, year, month, paidOn, reference } = req.body;
+  const { member, type, amount, year, month, paidOn, reference, cycle, round } = req.body;
 
   const t = await ContributionType.findById(type);
   if (!t || !t.isActive) throw new HttpError(400, "Invalid or inactive contribution type");
@@ -17,11 +17,17 @@ export const recordContribution = asyncHandler(async (req, res) => {
     if (dup) throw new HttpError(400, "This month is already recorded for the member");
   }
 
+  if (cycle && round) {
+    const dup = await Contribution.findOne({ member, cycle, round });
+    if (dup) throw new HttpError(400, "Member already paid into this round");
+  }
+
   const c = await Contribution.create({
     member, type,
     amount: amount || t.amount,
     year: year || new Date().getFullYear(),
     month, paidOn, reference,
+    cycle, round,
     recordedBy: req.user._id,
   });
 
