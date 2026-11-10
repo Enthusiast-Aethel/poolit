@@ -1,24 +1,29 @@
 import mongoose from "mongoose";
 
+const fineRuleSchema = new mongoose.Schema(
+  {
+    mode: { type: String, enum: ["percentage", "flat"], default: "flat" },
+    value: { type: Number, default: 0 },     // % of overdue amount, or KES flat
+    graceDays: { type: Number, default: 3 }, // 3 to 7 days
+  },
+  { _id: false }
+);
+
 const settingsSchema = new mongoose.Schema(
   {
     chamaName: { type: String, default: "Kilele Chama" },
-    monthlyContribution: { type: Number, default: 0 },
-    registrationFee: { type: Number, default: 0 },
-    welfareAmount: { type: Number, default: 0 },
-    merryGoRoundAmount: { type: Number, default: 0 },
 
-    loanMultiplier: { type: Number, default: 3 },        // 3x savings
-    interestRate: { type: Number, default: 11 },         // % per annum
-    smallLoanThreshold: { type: Number, default: 0 },    // loans <= this repay in smallLoanMonths
+    loanMultiplier: { type: Number, default: 3 },
+    interestRate: { type: Number, default: 11 },           // % per annum
+    smallLoanThreshold: { type: Number, default: 20000 }, // chairperson picks within 5,000-20,000
     smallLoanMonths: { type: Number, default: 3 },
     maxLoanMonths: { type: Number, default: 12 },
-    minGuarantors: { type: Number, default: 1 },
+    guarantorsRequired: { type: Number, default: 2 },
 
     fines: {
-      lateContribution: { type: Number, default: 0 },
-      missedMeeting: { type: Number, default: 0 },
-      lateRepayment: { type: Number, default: 0 },
+      lateContribution: { type: fineRuleSchema, default: () => ({ mode: "flat", value: 200 }) },
+      missedMeeting: { type: fineRuleSchema, default: () => ({ mode: "flat", value: 200 }) },
+      lateRepayment: { type: fineRuleSchema, default: () => ({ mode: "percentage", value: 5 }) },
     },
     contributionDueDay: { type: Number, default: 5 },    // day of month
   },

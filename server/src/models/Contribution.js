@@ -3,11 +3,7 @@ import mongoose from "mongoose";
 const contributionSchema = new mongoose.Schema(
   {
     member: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    type: {
-      type: String,
-      enum: ["monthly", "registration", "welfare", "merry_go_round"],
-      required: true,
-    },
+    type: { type: mongoose.Schema.Types.ObjectId, ref: "ContributionType", required: true },
     amount: { type: Number, required: true, min: 1 },
     year: { type: Number, required: true },
     month: { type: Number, min: 1, max: 12 },  // 1-12, drives the 12-month matrix
