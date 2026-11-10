@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema(
       default: "member",
     },
     isActive: { type: Boolean, default: true },
+    memberNo: { type: String, unique: true, sparse: true },
+    joinDate: { type: Date, default: Date.now },
+    registrationPaid: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
