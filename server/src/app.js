@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
+import routes from "./routes/index.js";
+import { notFound, errorHandler } from "./middleware/errors.js";
 
 const app = express();
 
@@ -15,5 +17,10 @@ app.get("/api/health", (req, res) => {
 
 // Mount authentication routes
 app.use("/api/auth", authRoutes);
+app.use("/api", routes);
+
+// Must be LAST
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

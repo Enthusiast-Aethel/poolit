@@ -8,13 +8,13 @@ const signToken = (id) =>
 
 // Only the chairperson creates accounts (see routes)
 export const createUser = async (req, res) => {
-  const { name, email, phone, password, role } = req.body;
+  const { name, email, phone, password, role, memberNo } = req.body;
   if (await User.findOne({ email })) {
     return res.status(400).json({ message: "Email already in use" });
   }
-  const user = await User.create({ name, email, phone, password, role });
+  const user = await User.create({ name, email, phone, password, role, memberNo });
   res.status(201).json({
-    id: user._id, name: user.name, email: user.email, role: user.role,
+    id: user._id, name: user.name, email: user.email, role: user.role, memberNo: user.memberNo,
   });
 };
 
