@@ -20,10 +20,10 @@ export default function Overview() {
   return (
     <div className="flex flex-col w-full">
       {/* Banner */}
-      <section className="relative overflow-hidden rounded-xl bg-primary-container text-surface-container-lowest p-6 lg:p-8 shadow-md">
-        <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-secondary-container/10 blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden rounded-xl bg-primary-container text-on-primary p-6 lg:p-8 shadow-md">
+        <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-secondary-container/15 blur-3xl pointer-events-none" />
         <div className="relative z-10 space-y-2 max-w-2xl">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-fixed font-label-sm text-label-sm">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
             <Icon name="shield_person" fill className="text-[15px]" /> Chairperson
           </span>
           <h1 className="font-headline-lg text-headline-lg font-bold tracking-tight">Welcome, {user.name}</h1>
@@ -62,7 +62,7 @@ export default function Overview() {
           </div>
           <Link to="/admin/loans" className="mt-4 p-3 rounded-lg bg-surface-container-low flex items-center justify-between hover:bg-surface-container">
             <span className="font-label-sm text-label-sm text-on-surface-variant">Waiting for approval</span>
-            <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-sm text-label-sm font-extrabold">{d.pendingLoanRequests}</span>
+            <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-extrabold">{d.pendingLoanRequests}</span>
           </Link>
         </div>
 
@@ -74,7 +74,7 @@ export default function Overview() {
             </div>
             <div className="mt-3 font-headline-md text-headline-md font-bold text-primary-container">{kes(d.welfareBalance)}</div>
           </div>
-          <div className="mt-4 flex items-center justify-between bg-error-container/30 px-3 py-2 rounded-lg">
+          <div className="mt-4 flex items-center justify-between bg-error-container/60 px-3 py-2 rounded-lg">
             <span className="font-label-sm text-label-sm text-on-error-container font-semibold">Unpaid fines</span>
             <span className="font-label-md text-label-md font-bold text-on-error-container">{kes(d.unpaidFines)}</span>
           </div>
@@ -88,7 +88,7 @@ export default function Overview() {
             </div>
             <div className="mt-3 font-headline-md text-headline-md font-bold text-primary-container">{kes(d.expensesThisYear)}</div>
           </div>
-          <p className="mt-4 font-body-sm text-body-sm text-on-surface-variant">Recorded under Settings &amp; expenses.</p>
+          <p className="mt-4 font-body-sm text-body-sm text-on-surface-variant">Recorded under Expenses &amp; investments.</p>
         </div>
       </section>
 
@@ -99,10 +99,10 @@ export default function Overview() {
           <span className="font-label-lg text-label-lg font-bold text-on-surface">Quick actions</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <Link to="/admin/contributions" className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-secondary text-surface-container-lowest font-label-lg text-label-lg font-bold hover:bg-on-secondary-container transition-colors">
+          <Link to="/admin/contributions" className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-secondary text-on-secondary font-label-lg text-label-lg font-bold hover:bg-primary-container transition-colors">
             <Icon name="add_circle" className="text-[20px]" /> Record contribution
           </Link>
-          <Link to="/admin/loans" className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-primary-container text-surface-container-lowest font-label-lg text-label-lg font-bold hover:bg-primary transition-colors">
+          <Link to="/admin/loans" className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-bold hover:bg-primary transition-colors">
             <Icon name="payments" className="text-[20px]" /> Review loans
           </Link>
           <Link to="/admin/meetings" className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-bold hover:bg-surface-container-high transition-colors">

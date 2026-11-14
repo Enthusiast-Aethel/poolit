@@ -6,6 +6,7 @@ import Investment from "../models/Investment.js";
 import User from "../models/User.js";
 import { asyncHandler, HttpError } from "../middleware/errors.js";
 import { getSavingsByMember } from "../utils/savings.js";
+import { allocate, computeDistributable } from "../utils/dividends.js";
 
 const round = (n) => Math.round(n * 100) / 100;
 
@@ -46,31 +47,30 @@ export const surplusPreview = asyncHandler(async (req, res) => {
 
 // Creates (or replaces) a DRAFT so the chairperson can review before finalizing
 export const createRun = asyncHandler(async (req, res) => {
-  const { year, distributableSurplus, note } = req.body;
-  if (!(distributableSurplus > 0)) throw new HttpError(400, "Distributable surplus must be greater than 0");
+  const year = Number(req.body.year);
+  const grossSurplus = Number(req.body.grossSurplus ?? req.body.distributableSurplus);
+  const reservePercent = Number(req.body.reservePercent) || 0;
+  const otherDeductions = Number(req.body.otherDeductions) || 0;
+  if (!year) throw new HttpError(400, "Choose the year");
+  if (!(grossSurplus > 0)) throw new HttpError(400, "Enter the surplus to be shared");
+  if (reservePercent < 0 || reservePercent > 100) throw new HttpError(400, "Reserve must be between 0 and 100%");
+
+  const { reserveAmount, distributable } = computeDistributable({ grossSurplus, reservePercent, otherDeductions });
+  if (!(distributable > 0)) throw new HttpError(400, "Nothing is left to share after the reserve and deductions");
+
   if (await DividendRun.findOne({ year, status: "finalized" }))
     throw new HttpError(400, `Dividends for ${year} are already finalized`);
-
   await DividendRun.deleteMany({ year, status: "draft" });
 
   const active = new Set((await User.find({ isActive: true }).select("_id")).map((u) => String(u._id)));
   const rows = (await getSavingsByMember(year)).filter((r) => active.has(String(r._id)) && r.total > 0);
-  const totalSavings = rows.reduce((s, r) => s + r.total, 0);
+  const { totalSavings, allocations, unallocated } = allocate(rows, distributable);
   if (!totalSavings) throw new HttpError(400, "No savings recorded, nothing to distribute");
 
-  // Dividend = surplus x (member savings / total savings), rounded DOWN to the cent
-  const allocations = rows.map((r) => ({
-    member: r._id,
-    savings: r.total,
-    share: r.total / totalSavings,
-    amount: Math.floor(((distributableSurplus * r.total) / totalSavings) * 100) / 100,
-  }));
-  const allocated = round(allocations.reduce((s, a) => s + a.amount, 0));
-
   const run = await DividendRun.create({
-    year, distributableSurplus, totalSavings, note,
-    unallocated: round(distributableSurplus - allocated),
-    allocations, createdBy: req.user._id,
+    year, grossSurplus, reservePercent, reserveAmount, otherDeductions,
+    distributableSurplus: distributable, totalSavings, unallocated, allocations,
+    note: req.body.note, createdBy: req.user._id,
   });
   res.status(201).json(run);
 });
@@ -106,8 +106,8 @@ export const markPaid = asyncHandler(async (req, res) => {
   if (!run || run.status !== "finalized") throw new HttpError(400, "Run must be finalized first");
   const a = run.allocations.find((x) => String(x.member) === req.params.memberId);
   if (!a) throw new HttpError(404, "Allocation not found");
-  a.paid = true;
-  a.paidOn = new Date();
+  a.paid = !a.paid; // click again to undo a mistake
+  a.paidOn = a.paid ? new Date() : undefined;
   await run.save();
   res.json(run);
 });

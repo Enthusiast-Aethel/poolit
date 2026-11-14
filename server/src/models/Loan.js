@@ -18,9 +18,10 @@ const guarantorSchema = new mongoose.Schema({
 
 const loanSchema = new mongoose.Schema(
   {
+    loanNo: { type: String, unique: true, sparse: true },
     member: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     principal: { type: Number, required: true, min: 1 },
-    interestRate: { type: Number, required: true },          // % p.a., copied from Settings at approval
+    interestRate: { type: Number, required: true }, // % p.a., copied from Settings when applied
     interestMethod: { type: String, enum: ["flat", "reducing"], required: true },
     termMonths: { type: Number, required: true, min: 1 },
     purpose: String,
@@ -42,9 +43,5 @@ const loanSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-loanSchema.virtual("balance").get(function () {
-  return Math.round((this.totalPayable - this.totalPaid) * 100) / 100;
-});
 
 export default mongoose.model("Loan", loanSchema);

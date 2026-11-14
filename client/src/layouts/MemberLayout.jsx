@@ -12,7 +12,7 @@ const NAV = [
 ];
 
 export default function MemberLayout() {
-  const { user, logout, isAdmin } = useAuth();
+  const { logout, isAdmin } = useAuth();
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -20,7 +20,7 @@ export default function MemberLayout() {
         <div className="h-16 px-margin-mobile flex items-center justify-between md:max-w-xl md:mx-auto">
           <div className="flex items-center gap-space-sm min-w-0">
             <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center shrink-0">
-              <Icon name="account_balance" className="text-secondary-container text-[20px]" />
+              <Icon name="account_balance" className="text-secondary-fixed text-[20px]" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider truncate">{CHAMA_NAME}</span>
@@ -29,7 +29,7 @@ export default function MemberLayout() {
           </div>
           <div className="flex items-center gap-space-sm shrink-0">
             {isAdmin && (
-              <Link to="/admin" className="px-3 py-1.5 rounded-full bg-primary-container text-surface-bright font-label-sm text-label-sm font-bold">
+              <Link to="/admin" className="px-3 py-1.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-bold">
                 Admin
               </Link>
             )}
@@ -45,7 +45,7 @@ export default function MemberLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_12px_rgba(11,31,58,0.06)]">
+      <nav className="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_12px_rgba(14,77,59,0.08)]">
         <div className="h-16 px-space-xs flex items-center justify-around md:max-w-xl md:mx-auto">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end}

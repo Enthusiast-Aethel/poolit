@@ -1,17 +1,25 @@
-// Loan eligibility, guarantors and max term
-export function loanRequirements({ amount, savings, settings }) {
-  const limit = savings * settings.loanMultiplier;
+const kes = (n) => `KES ${Math.round(n).toLocaleString("en-KE")}`;
 
-  if (amount > limit) {
-    return { allowed: false, reason: `Loan limit is KES ${limit} (${settings.loanMultiplier}x your savings)` };
+// Loan eligibility. The 3x limit is NET of what the member still owes
+// (active loan balances plus loans already requested or approved).
+export function loanRequirements({ amount, savings, outstanding = 0, settings }) {
+  const limit = savings * settings.loanMultiplier;
+  const available = Math.max(0, limit - outstanding);
+
+  if (amount > available) {
+    return {
+      allowed: false,
+      reason: `Available to borrow is ${kes(available)} (${settings.loanMultiplier}x savings of ${kes(savings)}, less ${kes(outstanding)} still owed)`,
+    };
   }
 
-  const selfGuaranteed = amount <= savings;
+  // Self-guarantee only applies to savings that are not already backing other loans
+  const unencumbered = Math.max(0, savings - outstanding);
+  const selfGuaranteed = amount <= unencumbered;
   const isSmall = amount <= settings.smallLoanThreshold || selfGuaranteed;
 
   return {
     allowed: true,
-    limit,
     selfGuaranteed,
     guarantorsRequired: selfGuaranteed ? 0 : settings.guarantorsRequired,
     maxTermMonths: isSmall ? settings.smallLoanMonths : settings.maxLoanMonths,

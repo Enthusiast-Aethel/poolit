@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const fineSchema = new mongoose.Schema(
   {
+    fineNo: { type: String, unique: true, sparse: true },
     member: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     reason: {
       type: String,

@@ -5,8 +5,10 @@ const roundSchema = new mongoose.Schema({
   position: { type: Number, required: true, immutable: true },
   member: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, immutable: true },
   payout: { type: Number, required: true, immutable: true },
+  scheduledDate: { type: Date, immutable: true },
   status: { type: String, enum: ["pending", "paid"], default: "pending" },
   paidOn: Date,
+  payoutRef: String,
 });
 
 const merrySchema = new mongoose.Schema(

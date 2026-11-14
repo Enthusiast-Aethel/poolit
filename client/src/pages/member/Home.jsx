@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import Icon from "../../components/Icon";
-import { kes, firstName, greeting, MONTHS, shortDate, monthlyStatus } from "../../utils/format";
+import { kes, firstName, greeting, MONTHS, shortDate } from "../../utils/format";
 
 export default function MemberHome() {
   const { user } = useAuth();
@@ -16,35 +16,32 @@ export default function MemberHome() {
       api.get("/my/loans"),
       api.get("/my/fines"),
       api.get("/my/loan-eligibility"),
-      api.get("/contribution-types"),
       api.get("/settings"),
+      api.get("/my/guarantees"),
     ])
-      .then(([savings, loans, fines, elig, types, settings]) =>
+      .then(([savings, loans, fines, elig, settings, guarantees]) =>
         setData({
           savings: savings.data, loans: loans.data, fines: fines.data,
-          elig: elig.data, types: types.data, settings: settings.data,
+          elig: elig.data, settings: settings.data, guarantees: guarantees.data,
         })
       )
-      .catch(() => setError("Could not load your records. Pull down to try again."));
+      .catch(() => setError("Could not load your records. Check your connection and try again."));
   }, []);
 
   if (error) return <p className="p-4 text-error font-body-md">{error}</p>;
   if (!data) return <p className="p-4 text-on-surface-variant font-body-md">Loading your records…</p>;
 
-  const { savings, loans, fines, elig, types, settings } = data;
+  const { savings, loans, fines, elig, settings, guarantees } = data;
 
-  const monthlyType = types.find((t) => t.code === "monthly");
-  const status = monthlyStatus({
-    contributions: savings.contributions,
-    monthlyAmount: monthlyType?.amount || 0,
-    dueDay: settings.contributionDueDay,
-    joinDate: user.joinDate,
-  });
+  // Arrears and due dates are worked out by the server so partial payments count correctly
+  const status = { ...savings.standing, nextDue: new Date(savings.standing.nextDue) };
+  const monthlyAmount = savings.monthlyAmount;
 
-  const activeLoans = loans.filter((l) => l.status === "active");
-  const loanBalance = activeLoans.reduce((s, l) => s + (l.totalPayable - l.totalPaid), 0);
+  const activeLoans = loans.filter((l) => ["active", "overdue"].includes(l.summary.displayStatus));
+  const loanBalance = activeLoans.reduce((s, l) => s + l.summary.balance, 0);
   const unpaidFines = fines.filter((f) => f.status === "unpaid").reduce((s, f) => s + f.amount, 0);
   const goodStanding = status.unpaidMonths === 0 && unpaidFines === 0;
+  const requests = guarantees.filter((g) => g.status === "pending" && g.myStatus === "pending").length;
   const recent = savings.contributions.slice(0, 5);
   const progress = status.dueMonths ? Math.round((status.paidMonths / status.dueMonths) * 100) : 100;
 
@@ -59,7 +56,7 @@ export default function MemberHome() {
           <div className="flex flex-wrap items-center gap-1.5 mt-1">
             {user.role !== "member" && (
               <span className="bg-primary-container text-surface-bright font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold capitalize">
-                {user.role}
+                {user.role.replace("_", " ")}
               </span>
             )}
             {user.memberNo && <span className="text-on-surface-variant font-body-sm text-body-sm">#{user.memberNo}</span>}
@@ -72,12 +69,20 @@ export default function MemberHome() {
         </span>
       </div>
 
+      {requests > 0 && (
+        <Link to="/app/loans" className="rounded-xl bg-warning-container text-on-warning-container p-4 shadow-sm flex items-center gap-3">
+          <Icon name="handshake" fill />
+          <div className="flex-1"><p className="font-label-lg text-label-lg font-bold">{requests} guarantee request{requests > 1 ? "s" : ""} waiting</p><p className="font-body-sm text-body-sm">A member is asking you to guarantee their loan.</p></div>
+          <Icon name="chevron_right" />
+        </Link>
+      )}
+
       {/* Hero: total savings */}
       <div className="relative overflow-hidden rounded-xl bg-primary-container text-surface-bright p-5 shadow-xl">
         <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-secondary-container opacity-10 blur-2xl pointer-events-none" />
         <p className="font-label-md text-label-md text-secondary-fixed uppercase tracking-wider font-bold">My total savings</p>
         <div className="flex items-baseline gap-2 mt-2">
-          <span className="font-headline-sm text-headline-sm font-extrabold text-secondary-container">KES</span>
+          <span className="font-headline-sm text-headline-sm font-extrabold text-secondary-fixed">KES</span>
           <span className="font-currency-stat text-currency-stat font-extrabold tracking-tight">
             {Math.round(savings.savings).toLocaleString("en-KE")}
           </span>
@@ -102,7 +107,7 @@ export default function MemberHome() {
           </div>
           {!status.paidThisMonth && (
             <span className={`px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold ${
-              status.daysLeft < 0 ? "bg-error-container text-on-error-container" : "bg-secondary-fixed text-on-secondary-fixed"}`}>
+              status.daysLeft < 0 ? "bg-error-container text-on-error-container" : "bg-warning-container text-on-warning-container"}`}>
               {status.daysLeft < 0 ? `${-status.daysLeft} days overdue` : status.daysLeft === 0 ? "Due today" : `In ${status.daysLeft} days`}
             </span>
           )}
@@ -110,7 +115,7 @@ export default function MemberHome() {
         <div className="bg-surface-container-low rounded-xl p-3.5 flex items-center justify-between">
           <div>
             <span className="font-label-sm text-label-sm text-outline">Amount</span>
-            <div className="font-headline-md text-headline-md font-extrabold text-on-surface">{kes(monthlyType?.amount)}</div>
+            <div className="font-headline-md text-headline-md font-extrabold text-on-surface">{kes(monthlyAmount)}</div>
           </div>
           <div className="text-right">
             <span className="font-label-sm text-label-sm text-outline">Due date</span>
@@ -138,11 +143,11 @@ export default function MemberHome() {
       {/* 2x2 summary */}
       <div className="grid grid-cols-2 gap-space-sm">
         <Tile label="Active loan" icon="credit_card_off" value={kes(loanBalance)}
-              note={activeLoans.length ? `${activeLoans.length} running` : "No active debt"} good={!activeLoans.length} />
-        <Tile label="Borrow limit" icon="trending_up" value={kes(elig.limit)} note={`${settings.loanMultiplier}x savings`} accent />
+              note={activeLoans.length ? `${activeLoans.length} running` : "No active debt"} good={!activeLoans.length} to="/app/loans" />
+        <Tile label="Can borrow now" icon="trending_up" value={kes(elig.available)} note={`${settings.loanMultiplier}x savings, less loans owed`} accent to="/app/loans" />
         <Tile label="My arrears" icon="verified" value={kes(status.arrears)}
-              note={status.unpaidMonths ? `${status.unpaidMonths} month(s) unpaid` : "Zero arrears"} good={!status.unpaidMonths} />
-        <Tile label="Fines" icon="gavel" value={kes(unpaidFines)} note={unpaidFines ? "Unpaid" : "No fines"} good={!unpaidFines} />
+              note={status.unpaidMonths ? `${status.unpaidMonths} month(s) unpaid` : "Zero arrears"} good={!status.unpaidMonths} to="/app/savings" />
+        <Tile label="Fines" icon="gavel" value={kes(unpaidFines)} note={unpaidFines ? "Unpaid" : "No fines"} good={!unpaidFines} to="/app/welfare" />
       </div>
 
       {/* Recent contributions */}
@@ -179,15 +184,15 @@ export default function MemberHome() {
   );
 }
 
-function Tile({ label, icon, value, note, good, accent }) {
+function Tile({ label, icon, value, note, good, accent, to }) {
   return (
-    <div className="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex flex-col justify-between">
+    <Link to={to} className="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex flex-col justify-between active:scale-[0.98] transition-transform">
       <div className="flex items-center justify-between mb-2">
         <span className={`font-label-sm text-label-sm font-semibold ${accent ? "text-secondary" : "text-outline"}`}>{label}</span>
         <Icon name={icon} className={`text-[18px] ${accent ? "text-secondary" : "text-outline"}`} />
       </div>
       <div className={`font-headline-sm text-headline-sm font-bold ${accent ? "text-secondary" : "text-on-surface"}`}>{value}</div>
       <p className={`font-label-sm text-label-sm font-bold mt-0.5 ${good ? "text-on-tertiary-container" : "text-on-surface-variant"}`}>{note}</p>
-    </div>
+    </Link>
   );
 }

@@ -31,12 +31,12 @@ export default function Login() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="relative w-full max-w-5xl">
-        <div className="absolute -top-16 -left-16 w-96 h-96 bg-secondary-fixed/30 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute -bottom-16 -right-16 w-96 h-96 bg-primary-fixed/40 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute -top-16 -left-16 w-96 h-96 bg-secondary-fixed/40 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute -bottom-16 -right-16 w-96 h-96 bg-primary-fixed rounded-full blur-3xl pointer-events-none -z-10" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 rounded-xl bg-surface-container-lowest shadow-xl overflow-hidden">
           {/* Brand panel */}
-          <div className="lg:col-span-5 bg-primary-container text-surface-container-lowest p-8 lg:p-10 flex flex-col relative overflow-hidden">
+          <div className="lg:col-span-5 bg-primary-container text-on-primary p-8 lg:p-10 flex flex-col relative overflow-hidden">
             <div className="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
               <svg fill="currentColor" height="280" viewBox="0 0 100 100" width="280">
                 <polygon points="50,5 90,90 10,90" />
@@ -45,7 +45,7 @@ export default function Login() {
             </div>
             <div className="relative z-10 flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center">
-                <Icon name="account_balance" fill className="text-primary-container" />
+                <Icon name="account_balance" fill className="text-on-secondary-container" />
               </div>
               <div>
                 <p className="font-headline-sm text-headline-sm tracking-tight">{APP_NAME}</p>
@@ -54,7 +54,7 @@ export default function Login() {
             </div>
             <div className="relative z-10 mt-10">
               <h1 className="font-headline-lg text-headline-lg leading-tight">Institutional Wealth, Communal Dignity.</h1>
-              <p className="mt-3 font-body-md text-body-md text-surface-dim">
+              <p className="mt-3 font-body-md text-body-md text-primary-fixed-dim">
                 Harambee solidarity with clear, accountable records of every contribution, loan and payout.
               </p>
             </div>
@@ -80,7 +80,7 @@ export default function Login() {
                     id="identifier" autoComplete="username" required
                     value={identifier} onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="0722 123 456"
-                    className="w-full h-12 px-3 font-body-md text-body-md bg-transparent focus:outline-none placeholder:text-outline-variant"
+                    className="w-full h-12 px-3 font-body-md text-body-md bg-transparent focus:outline-none placeholder:text-outline"
                   />
                 </div>
               </div>

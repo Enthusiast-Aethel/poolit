@@ -5,13 +5,14 @@ import * as members from "../controllers/memberController.js";
 import * as contributions from "../controllers/contributionController.js";
 import * as loans from "../controllers/loanController.js";
 import * as fines from "../controllers/fineController.js";
+import * as my from "../controllers/myController.js";
 import * as merry from "../controllers/merryController.js";
 import * as welfare from "../controllers/welfareController.js";
 import * as meetings from "../controllers/meetingController.js";
 import * as finance from "../controllers/financeController.js";
 import * as dividends from "../controllers/dividendController.js";
+import * as sms from "../controllers/smsController.js";
 import { dashboard } from "../controllers/dashboardController.js";
-import myRoutes from "./myRoutes.js";
 
 const router = Router();
 router.use(protect); // everything below needs login
@@ -22,15 +23,19 @@ router.get("/dashboard", adminOnly, dashboard);
 // Settings and contribution types
 router.get("/settings", settings.getSettings);
 router.put("/settings", adminOnly, settings.updateSettings);
+router.get("/settings/log", adminOnly, settings.getLog);
 router.get("/contribution-types", settings.listTypes);
 router.post("/contribution-types", adminOnly, settings.createType);
 router.put("/contribution-types/:id", adminOnly, settings.updateType);
 
-// Members
+// Members (static paths first, then :id)
 router.get("/members/guarantor-options", members.listGuarantorOptions);
+router.get("/members/overview", adminOnly, members.memberOverview);
 router.get("/members", adminOnly, members.listMembers);
 router.get("/members/:id", adminOnly, members.getMember);
 router.put("/members/:id", adminOnly, members.updateMember);
+router.get("/members/:id/eligibility", adminOnly, members.memberEligibility);
+router.patch("/members/:id/password", adminOnly, members.resetPassword);
 
 // Contributions
 router.get("/contributions/matrix", adminOnly, contributions.matrix);
@@ -38,6 +43,7 @@ router.get("/contributions", adminOnly, contributions.listContributions);
 router.post("/contributions", adminOnly, contributions.recordContribution);
 
 // Loans
+router.post("/loans/preview", loans.previewLoan);
 router.post("/loans", loans.applyLoan);
 router.get("/loans", adminOnly, loans.listLoans);
 router.get("/loans/:id", loans.getLoan);
@@ -60,7 +66,9 @@ router.patch("/merry-go-round/:id/rounds/:position/pay", adminOnly, merry.payRou
 
 // Welfare
 router.get("/welfare", adminOnly, welfare.welfareSummary);
-router.post("/welfare/payouts", adminOnly, welfare.createPayout);
+router.post("/welfare/claims", adminOnly, welfare.createClaim);
+router.patch("/welfare/claims/:id/pay", adminOnly, welfare.payClaim);
+router.patch("/welfare/claims/:id/reject", adminOnly, welfare.rejectClaim);
 
 // Meetings and attendance
 router.get("/meetings", adminOnly, meetings.listMeetings);
@@ -69,6 +77,7 @@ router.get("/meetings/:id", adminOnly, meetings.getMeeting);
 router.put("/meetings/:id", adminOnly, meetings.updateMeeting);
 router.put("/meetings/:id/attendance", adminOnly, meetings.markAttendance);
 router.post("/meetings/:id/fines", adminOnly, meetings.fineAbsentees);
+router.post("/meetings/:id/remind", adminOnly, meetings.remind);
 
 // Expenses and investments
 router.get("/expenses", adminOnly, finance.listExpenses);
@@ -88,7 +97,24 @@ router.patch("/dividends/:id/finalize", adminOnly, dividends.finalizeRun);
 router.delete("/dividends/:id", adminOnly, dividends.deleteDraft);
 router.patch("/dividends/:id/pay/:memberId", adminOnly, dividends.markPaid);
 
-// Member portal ("my" data sub-routes)
-router.use("/my", myRoutes);
+// Text messages
+router.get("/sms/status", adminOnly, sms.status);
+router.get("/sms/templates", adminOnly, sms.templates);
+router.get("/sms/logs", adminOnly, sms.listLogs);
+router.post("/sms/broadcast", adminOnly, sms.broadcast);
+router.post("/sms/test", adminOnly, sms.test);
+router.post("/sms/reminders/run", adminOnly, sms.runNow);
+
+// Member portal ("my" data only)
+router.get("/my/savings", my.mySavings);
+router.get("/my/loans", my.myLoans);
+router.get("/my/guarantees", my.myGuarantees);
+router.get("/my/fines", my.myFines);
+router.get("/my/loan-eligibility", my.myLoanEligibility);
+router.get("/my/statement", my.myStatement);
+router.get("/my/welfare", my.myWelfare);
+router.post("/my/welfare/claims", my.submitWelfareClaim);
+router.get("/my/attendance", my.myAttendance);
+router.get("/my/dividends", my.myDividends);
 
 export default router;

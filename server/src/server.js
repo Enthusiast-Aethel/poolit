@@ -3,9 +3,11 @@ dotenv.config();
 
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
+import { startReminderScheduler } from "./services/reminders.js";
 
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`PoolIt API running on port ${PORT}`));
+  startReminderScheduler(); // daily SMS reminders when SMS_REMINDERS=on
 });
