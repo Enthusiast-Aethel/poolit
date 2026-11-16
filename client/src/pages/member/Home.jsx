@@ -164,7 +164,7 @@ export default function MemberHome() {
               <div key={c._id} className="p-3 rounded-xl bg-surface-container-low flex items-center justify-between">
                 <div className="min-w-0">
                   <span className="block font-label-md text-label-md text-on-surface font-bold truncate">
-                    {c.type?.name}{c.month ? ` · ${MONTHS[c.month - 1]} ${c.year}` : ""}
+                    {c.opening ? "Opening balance" : c.type?.name}{c.month ? ` · ${MONTHS[c.month - 1]} ${c.year}` : ""}
                   </span>
                   <span className="block font-body-sm text-body-sm text-outline truncate">
                     {shortDate(c.paidOn)}{c.reference ? ` · ${c.reference}` : ""}

@@ -109,6 +109,8 @@ export const resetPassword = asyncHandler(async (req, res) => {
   if (password.length < 6) throw new HttpError(400, "Password must be at least 6 characters");
 
   u.password = password;
+  u.mustChangePassword = true;
+  u.passwordChangedAt = new Date();
   await u.save();
   res.json({ message: "Password updated", ...(generated && { temporaryPassword: password }) });
 });

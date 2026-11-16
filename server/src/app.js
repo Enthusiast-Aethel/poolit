@@ -47,6 +47,14 @@ app.use(
   })
 );
 
+app.use(
+  "/api/auth/password",
+  rateLimit({
+    windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false,
+    message: { message: "Too many attempts. Please wait 15 minutes and try again." },
+  })
+);
+
 app.get("/api/health", (req, res) => res.json({ status: "ok", app: "PoolIt API" }));
 // the SMS provider calls this itself, so it has no login; it is protected by a secret in the address
 app.post("/api/sms/delivery", deliveryReport);

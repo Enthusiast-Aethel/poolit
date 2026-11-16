@@ -9,13 +9,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// An expired or invalid token sends the person back to the login page
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && !err.config.url.includes("/auth/login")) {
+    const status = err.response?.status;
+    const url = err.config?.url || "";
+    // An expired or invalid token sends the person back to the login page
+    if (status === 401 && !url.includes("/auth/login")) {
       localStorage.removeItem(TOKEN_KEY);
       window.location.assign("/login");
+    }
+    // A temporary password has to be replaced before anything else works
+    if (status === 403 && err.response?.data?.code === "PASSWORD_CHANGE_REQUIRED" && window.location.pathname !== "/change-password") {
+      window.location.assign("/change-password");
     }
     return Promise.reject(err);
   }

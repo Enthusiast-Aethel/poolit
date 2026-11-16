@@ -25,8 +25,10 @@ const userSchema = new mongoose.Schema(
     joinDate: { type: Date, default: Date.now },
     registrationPaid: { type: Boolean, default: false },
     smsOptOut: { type: Boolean, default: false }, // does not want text messages
+    mustChangePassword: { type: Boolean, default: false }, // set for temporary passwords
+    passwordChangedAt: Date, // sign-ins from before this moment stop working
     nationalId: { type: String, trim: true, select: false },
-    nextOfKin: { name: String, relationship: String },
+    nextOfKin: { name: String, relationship: String, phone: String },
   },
   { timestamps: true }
 );

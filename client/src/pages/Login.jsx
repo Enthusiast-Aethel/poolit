@@ -13,7 +13,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   // Already signed in: send each role to its own portal
-  if (user) return <Navigate to={user.role === "chairperson" ? "/admin" : "/app"} replace />;
+  if (user) return <Navigate to={user.mustChangePassword ? "/change-password" : user.role === "chairperson" ? "/admin" : "/app"} replace />;
 
   const submit = async (e) => {
     e.preventDefault();

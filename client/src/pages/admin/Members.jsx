@@ -242,7 +242,7 @@ function MemberDrawer({ id, onClose, onChanged, onEdit, onFine, onSecret }) {
             <Row label="Phone" value={m.phone} />
             <Row label="Email" value={m.email || "—"} />
             <Row label="National ID" value={m.nationalId || "—"} />
-            <Row label="Next of kin" value={m.nextOfKin?.name ? `${m.nextOfKin.name}${m.nextOfKin.relationship ? ` (${m.nextOfKin.relationship})` : ""}` : "—"} />
+            <Row label="Next of kin" value={m.nextOfKin?.name ? `${m.nextOfKin.name}${m.nextOfKin.relationship ? ` (${m.nextOfKin.relationship})` : ""}${m.nextOfKin.phone ? `, ${m.nextOfKin.phone}` : ""}` : "—"} />
           </Section>
 
           <Section title="Guaranteeing">
@@ -297,7 +297,7 @@ function MemberFormModal({ member, onClose, onSaved }) {
   const [f, setF] = useState({
     name: member?.name || "", phone: member?.phone || "", email: member?.email || "",
     role: member?.role || "member", memberNo: member?.memberNo || "",
-    nationalId: "", kinName: member?.nextOfKin?.name || "", kinRel: member?.nextOfKin?.relationship || "",
+    nationalId: "", kinName: member?.nextOfKin?.name || "", kinRel: member?.nextOfKin?.relationship || "", kinPhone: member?.nextOfKin?.phone || "",
     smsOptOut: !!member?.smsOptOut,
   });
   const [saving, setSaving] = useState(false);
@@ -310,7 +310,7 @@ function MemberFormModal({ member, onClose, onSaved }) {
     setSaving(true);
     const payload = {
       name: f.name, phone: f.phone, email: f.email, role: f.role, memberNo: f.memberNo || undefined,
-      nationalId: f.nationalId || undefined, nextOfKin: { name: f.kinName, relationship: f.kinRel },
+      nationalId: f.nationalId || undefined, nextOfKin: { name: f.kinName, relationship: f.kinRel, phone: f.kinPhone },
       ...(editing ? { smsOptOut: f.smsOptOut } : {}),
     };
     try {
@@ -349,6 +349,7 @@ function MemberFormModal({ member, onClose, onSaved }) {
         </Field>
         <Field label="Next of kin"><input className={inputCls} value={f.kinName} onChange={set("kinName")} /></Field>
         <Field label="Relationship"><input className={inputCls} value={f.kinRel} onChange={set("kinRel")} placeholder="Spouse, sibling…" /></Field>
+        <Field label="Next of kin phone" className="sm:col-span-2"><input className={inputCls} value={f.kinPhone} onChange={set("kinPhone")} /></Field>
         {editing && (
           <label className="sm:col-span-2 flex items-center gap-2 font-label-md text-label-md">
             <input type="checkbox" className="w-4 h-4 accent-primary-container" checked={f.smsOptOut} onChange={(e) => setF({ ...f, smsOptOut: e.target.checked })} />

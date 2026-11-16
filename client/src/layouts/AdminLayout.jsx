@@ -54,6 +54,9 @@ export default function AdminLayout() {
               <div className="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm text-label-sm font-bold">
                 {initials(user.name)}
               </div>
+              <Link to="/app/account" aria-label="My account and password" title="My account and password" className="text-on-primary-container hover:text-on-primary">
+                <Icon name="manage_accounts" className="text-[20px]" />
+              </Link>
               <button onClick={logout} aria-label="Sign out" className="text-on-primary-container hover:text-on-primary">
                 <Icon name="logout" className="text-[20px]" />
               </button>

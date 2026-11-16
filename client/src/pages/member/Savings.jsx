@@ -117,7 +117,7 @@ export default function MySavings() {
             {history.map((c) => (
               <div key={c._id} className="p-3 rounded-xl bg-surface-container-low flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-label-md text-label-md font-bold text-on-surface truncate">{c.type?.name}{c.month ? ` · ${MONTHS[c.month - 1]} ${c.year}` : ""}</p>
+                  <p className="font-label-md text-label-md font-bold text-on-surface truncate">{c.opening ? "Opening balance" : c.type?.name}{c.month ? ` · ${MONTHS[c.month - 1]} ${c.year}` : ""}</p>
                   <p className="font-body-sm text-body-sm text-outline truncate">{shortDate(c.paidOn)}{c.reference ? ` · ${c.reference}` : ""}</p>
                 </div>
                 <span className="font-label-lg text-label-lg font-extrabold shrink-0">{kes(c.amount)}</span>

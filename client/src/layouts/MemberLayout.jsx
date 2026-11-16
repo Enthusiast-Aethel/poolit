@@ -33,6 +33,10 @@ export default function MemberLayout() {
                 Admin
               </Link>
             )}
+            <Link to="/app/account" aria-label="My account"
+              className="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface active:bg-surface-container-high">
+              <Icon name="account_circle" className="text-[24px]" />
+            </Link>
             <button onClick={logout} aria-label="Sign out"
               className="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface active:bg-surface-container-high">
               <Icon name="logout" className="text-[22px]" />

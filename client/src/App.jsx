@@ -19,7 +19,9 @@ const Dividends = lazy(() => import("./pages/admin/Dividends"));
 const Finance = lazy(() => import("./pages/admin/Finance"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const Messages = lazy(() => import("./pages/admin/Messages"));
+import ChangePassword from "./pages/ChangePassword";
 import MemberHome from "./pages/member/Home";
+import Account from "./pages/member/Account";
 import MySavings from "./pages/member/Savings";
 import MyLoans from "./pages/member/Loans";
 import MyWelfare from "./pages/member/Welfare";
@@ -44,6 +46,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/change-password" element={<ChangePassword />} />
 
       {/* Chairperson portal */}
       <Route element={<ProtectedRoute admin />}>
@@ -71,6 +74,7 @@ export default function App() {
           <Route path="savings" element={<MySavings />} />
           <Route path="loans" element={<MyLoans />} />
           <Route path="welfare" element={<MyWelfare />} />
+          <Route path="account" element={<Account />} />
         </Route>
         {/* The statement is a plain page with no menus, so it prints cleanly */}
         <Route path="/app/statement" element={<Statement />} />

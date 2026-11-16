@@ -6,12 +6,13 @@ const contributionSchema = new mongoose.Schema(
     type: { type: mongoose.Schema.Types.ObjectId, ref: "ContributionType", required: true },
     amount: { type: Number, required: true, min: 1 },
     year: { type: Number, required: true },
-    month: { type: Number, min: 1, max: 12 },  // 1-12, drives the 12-month matrix
+    month: { type: Number, min: 1, max: 12 }, // 1-12, drives the 12-month matrix
     paidOn: { type: Date, default: Date.now },
-    reference: { type: String, trim: true },   // e.g. M-Pesa code
+    reference: { type: String, trim: true }, // e.g. M-Pesa code
     recordedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     cycle: { type: mongoose.Schema.Types.ObjectId, ref: "MerryGoRound" },
     round: Number,
+    opening: { type: Boolean, default: false }, // savings brought forward from before PoolIt (no month)
   },
   { timestamps: true }
 );

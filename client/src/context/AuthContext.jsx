@@ -24,13 +24,19 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   };
 
+  // used after a password change, which starts a fresh session
+  const setSession = (token, nextUser) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    setUser(nextUser);
+  };
+
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin: user?.role === "chairperson" }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, setSession, isAdmin: user?.role === "chairperson" }}>
       {children}
     </AuthContext.Provider>
   );

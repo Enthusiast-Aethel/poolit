@@ -107,7 +107,7 @@ export default function Statement() {
 
               <Block icon="savings" title={`Contributions in ${d.year}`}>
                 <Table head={["Date", "Type", "For", "Reference", "Amount"]} right={[4]} empty="No contributions recorded in this period."
-                  rows={d.contributions.map((c) => [fullDate(c.paidOn), c.type?.name, c.month ? `${MONTHS[c.month - 1]} ${c.year}` : "—", c.reference || "—", kes(c.amount)])}
+                  rows={d.contributions.map((c) => [fullDate(c.paidOn), c.opening ? "Opening balance" : c.type?.name, c.month ? `${MONTHS[c.month - 1]} ${c.year}` : "—", c.reference || "—", kes(c.amount)])}
                   foot={d.contributions.length ? ["Total", "", "", "", kes(d.summary.contributedInYear)] : null} />
               </Block>
 
